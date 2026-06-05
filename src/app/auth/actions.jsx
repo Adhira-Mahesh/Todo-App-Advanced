@@ -1,5 +1,6 @@
 // app/login/actions.js
 'use server';
+import { redirect } from 'next/navigation';
 
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -36,4 +37,30 @@ export async function registerUser(formData) {
   } catch (error) {
     return { error: "Something went wrong. Try again." };
   }
+}
+
+export async function loginUser(formData) {
+  const email = formData.get('email');
+  const password = formData.get('password');
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    return { error: 'User not found' };
+  }
+
+  const isValid = await bcrypt.compare(
+    password,
+    user.password
+  );
+
+  if (!isValid) {
+    return { error: 'Incorrect password' };
+  }
+if (isValid) {
+  redirect('/');
+}
+  return { success: 'Login successful!' };
 }

@@ -14,3 +14,10 @@ model Todo {
   isCompleted Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String   // In a real app, always hash this!
+  createdAt DateTime @default(now())
+}

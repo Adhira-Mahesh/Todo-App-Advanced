@@ -1,5 +1,5 @@
 'use client';
-
+import { registerUser , loginUser} from '@/app/auth/actions'; // Import the server action for registration
 import { useState } from 'react';
 // We use lucide-react icons instead of loading heavy FontAwesome script tags
 import { FaFacebook, FaGithub, FaLinkedin } from 'react-icons/fa';
@@ -9,11 +9,39 @@ import styles from './authform.module.css';
 export default function AuthPage() {
   // State to track whether the signup panel is active
   const [isSignUp, setIsSignUp] = useState(false);
+  const [message, setMessage] = useState('');
 
   // Prevent forms from reloading the page on submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSignUpSubmit = async (event) => {
+    event.preventDefault();
+      console.log("Signup button clicked");
+    const formData = new FormData(event.currentTarget);
+    
+    console.log("Calling registerUser...");
+const result = await registerUser(formData);
+console.log("Result:", result);
+    
+    if (result.error) {
+      setMessage(`❌ ${result.error}`);
+    } else {
+      setMessage(`✅ ${result.success}`);
+      // Optional: switch to login panel after successful registration
+      setIsSignUp(false); 
+    }
   };
+  const handleLoginSubmit = async (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(event.currentTarget);
+
+  const result = await loginUser(formData);
+
+  if (result.error) {
+    setMessage(`❌ ${result.error}`);
+  } else {
+    setMessage(`✅ ${result.success}`);
+  }
+};
 
   return (
     <div className={styles.bodyWrapper}>
@@ -22,7 +50,7 @@ export default function AuthPage() {
         
         {/* --- SIGN UP FORM --- */}
         <div className={`${styles.formContainer} ${styles.signUp}`}>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSignUpSubmit}>
             <h1>Create Account</h1>
             <div className={styles.socialIcons}>
               <a href="#" className={styles.icon}><FaChrome size={20} /></a>
@@ -31,16 +59,35 @@ export default function AuthPage() {
               <a href="#" className={styles.icon}><FaLinkedin size={20} /></a>
             </div>
             <span>or use your email for registration</span>
-            <input type="text" placeholder="Name" />
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
+         <input
+  type="text"
+  name="name"
+  placeholder="Name"
+/>
+
+<input
+  type="email"
+  name="email"
+  placeholder="Email"
+/>
+
+<input
+  type="password"
+  name="password"
+  placeholder="Password"
+/>
             <button type="submit">Sign Up</button>
+            {message && (
+  <p style={{ color: 'red', marginTop: '10px' }}>
+    {message}
+  </p>
+)}
           </form>
         </div>
 
         {/* --- SIGN IN FORM --- */}
         <div className={`${styles.formContainer} ${styles.signIn}`}>
-          <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLoginSubmit}>
             <h1>Sign In</h1>
             <div className={styles.socialIcons}>
               <a href="#" className={styles.icon}><FaChrome size={20} /></a>
@@ -49,10 +96,27 @@ export default function AuthPage() {
               <a href="#" className={styles.icon}><FaLinkedin size={20} /></a>
             </div>
             <span>or use your email password</span>
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
+
+<input
+  type="email"
+  name="email"
+  placeholder="Email"
+/>
+
+<input
+  type="password"
+  name="password"
+  placeholder="Password"
+/>
             <a href="#">Forget Your Password?</a>
-            <button type="submit">Sign In</button>
+         <button type="submit">Sign In</button>
+
+{message && (
+  <p style={{ marginTop: '10px' }}>
+    {message}
+  </p>
+)}
+            
           </form>
         </div>
 
