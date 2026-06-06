@@ -109,7 +109,7 @@ console.log("Result:", result);
   placeholder="Password"
 />
             <a href="#">Forget Your Password?</a>
-         <button type="submit">Sign In</button>
+         <button type="submit" onClick={() => setIsSignUp(false)}>Sign In</button>
 
 {message && (
   <p style={{ marginTop: '10px' }}>
