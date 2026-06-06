@@ -801,20 +801,7 @@ export default function Dashboard() {
                   </div>
                 </section>
 
-                {/* Ambient Visual / Mood Grid Piece */}
-                <div className="rounded-2xl overflow-hidden aspect-video relative group shadow-sm border border-outline-variant/30">
-                  <img 
-                    alt="Peaceful workplace" 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                    src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=400&q=80"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-lg">
-                    <div>
-                      <span className="text-white text-sm font-bold block mb-0.5">Find your flow today.</span>
-                      <span className="text-[10px] text-white/70 font-semibold block">Create a minimalist environment for maximum outcome.</span>
-                    </div>
-                  </div>
-                </div>
+            
 
               </div>
             </div>
