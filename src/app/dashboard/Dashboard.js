@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { logoutUser } from '@/app/auth/actions';
 import { 
-  CheckSquare, Plus, Inbox, Calendar, Folder, 
+  CheckSquare, Plus, Inbox, Calendar,
   Archive, Trash2, Search, Bell, Settings, 
   MoreVertical, BarChart2, Check, X, Clock,
   Play, Pause, RotateCcw, Edit2, Sun, Moon, 
-  Sparkles, Trash, CheckCircle
+  Sparkles, Trash, CheckCircle, Crown, LogOut
 } from 'lucide-react';
 
-export default function Dashboard() {
+export default function Dashboard({ sessionUser = null }) {
   // --- 1. State Management ---
   const [tasks, setTasks] = useState([
     { 
@@ -367,7 +369,9 @@ export default function Dashboard() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-primary dark:text-primary-fixed-dim leading-none">Workspace</h2>
-            <p className="text-xs text-on-surface-variant mt-1 font-medium">Personal Focus</p>
+            <p className="text-xs text-on-surface-variant mt-1 font-medium">
+              {sessionUser?.name || 'Personal Focus'}
+            </p>
           </div>
         </div>
         
@@ -435,6 +439,28 @@ export default function Dashboard() {
           >
             <Trash2 size={18} /> <span className="text-sm">Trash</span>
           </button>
+
+          {/* Admin Panel Link — only for admins */}
+          {sessionUser?.role === 'ADMIN' && (
+            <Link
+              href="/admin"
+              className="w-full flex items-center gap-md px-md py-sm rounded-lg transition-all text-left font-medium cursor-pointer text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+            >
+              <Crown size={18} /> <span className="text-sm font-bold">Admin Panel</span>
+            </Link>
+          )}
+        </div>
+
+        {/* Logout */}
+        <div className="pb-sm">
+          <form action={logoutUser}>
+            <button
+              type="submit"
+              className="w-full flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-colors text-left font-medium cursor-pointer text-sm"
+            >
+              <LogOut size={16} /> <span>Sign Out</span>
+            </button>
+          </form>
         </div>
       </aside>
 
@@ -480,8 +506,10 @@ export default function Dashboard() {
                 <Settings size={18} />
               </button>
             </div>
-            <div className="w-8 h-8 rounded-full border border-outline-variant bg-gray-300 overflow-hidden shadow-sm">
-              <img alt="User profile" className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"/>
+            <div className="w-8 h-8 rounded-full border border-outline-variant bg-primary-container flex items-center justify-center shadow-sm">
+              <span className="text-xs font-black text-on-primary-container">
+                {sessionUser?.name ? sessionUser.name[0].toUpperCase() : sessionUser?.email ? sessionUser.email[0].toUpperCase() : '?'}
+              </span>
             </div>
           </div>
         </header>

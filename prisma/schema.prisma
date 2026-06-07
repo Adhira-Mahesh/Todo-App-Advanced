@@ -8,16 +8,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model Todo {
   id          String   @id @default(uuid()) @map("_id")
   title       String?
   isCompleted Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
+
 model User {
   id        String   @id @default(uuid())
   name      String?
   email     String   @unique
-  password  String   // In a real app, always hash this!
+  password  String
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
-}
+}
