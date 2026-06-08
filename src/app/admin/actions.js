@@ -1,12 +1,10 @@
 // app/admin/actions.js
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/utils/prisma';
 import bcrypt from 'bcryptjs';
 import { getSession } from '@/lib/session';
 import { revalidatePath } from 'next/cache';
-
-const prisma = new PrismaClient();
 
 /** Guard: throws if the caller is not an admin */
 async function requireAdmin() {
@@ -37,13 +35,16 @@ export async function addUser(formData) {
 
   if (!email || !password) return { error: 'Email and password are required' };
 
+  // Validate role against the enum — never trust client input directly
+  const validatedRole = role === 'ADMIN' ? 'ADMIN' : 'USER';
+
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return { error: 'Email already registered' };
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await prisma.user.create({
-    data: { name, email, password: hashedPassword, role },
+    data: { name, email, password: hashedPassword, role: validatedRole },
   });
 
   revalidatePath('/admin');

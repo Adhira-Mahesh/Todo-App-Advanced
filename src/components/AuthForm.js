@@ -1,5 +1,5 @@
 'use client';
-import { registerUser , loginUser} from '@/app/auth/actions'; // Import the server action for registration
+import { registerUser , loginUser, requestPasswordReset, verifyResetCodeAndResetPassword } from '@/app/auth/actions'; // Import server actions
 import { useState } from 'react';
 // We use lucide-react icons instead of loading heavy FontAwesome script tags
 import { FaFacebook, FaGithub, FaLinkedin } from 'react-icons/fa';
@@ -10,6 +10,49 @@ export default function AuthPage() {
   // State to track whether the signup panel is active
   const [isSignUp, setIsSignUp] = useState(false);
   const [message, setMessage] = useState('');
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetStep, setResetStep] = useState(1);
+  const [resetEmail, setResetEmail] = useState('');
+
+  const handleRequestReset = async (event) => {
+    event.preventDefault();
+    setMessage('');
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email');
+    if (!email) {
+      setMessage('❌ Email is required');
+      return;
+    }
+    setResetEmail(email);
+    const result = await requestPasswordReset(email);
+    if (result.error) {
+      setMessage(`❌ ${result.error}`);
+    } else {
+      setMessage(`✅ ${result.success}`);
+      setResetStep(2);
+    }
+  };
+
+  const handleVerifyReset = async (event) => {
+    event.preventDefault();
+    setMessage('');
+    const formData = new FormData(event.currentTarget);
+    const code = formData.get('code');
+    const newPassword = formData.get('password');
+    if (!code || !newPassword) {
+      setMessage('❌ Code and Password are required');
+      return;
+    }
+    const result = await verifyResetCodeAndResetPassword(resetEmail, code, newPassword);
+    if (result.error) {
+      setMessage(`❌ ${result.error}`);
+    } else {
+      setMessage(`✅ ${result.success}`);
+      setIsForgotPassword(false);
+      setResetStep(1);
+      setResetEmail('');
+    }
+  };
 
   // Prevent forms from reloading the page on submit
 const handleSignUpSubmit = async (event) => {
@@ -87,37 +130,86 @@ console.log("Result:", result);
 
         {/* --- SIGN IN FORM --- */}
         <div className={`${styles.formContainer} ${styles.signIn}`}>
-      <form onSubmit={handleLoginSubmit}>
-            <h1>Sign In</h1>
-            <div className={styles.socialIcons}>
-              <a href="#" className={styles.icon}><FaChrome size={20} /></a>
-              <a href="#" className={styles.icon}><FaFacebook size={20} /></a>
-              <a href="#" className={styles.icon}><FaGithub size={20} /></a>
-              <a href="#" className={styles.icon}><FaLinkedin size={20} /></a>
-            </div>
-            <span>or use your email password</span>
+          {isForgotPassword ? (
+            resetStep === 1 ? (
+              <form onSubmit={handleRequestReset}>
+                <h1 style={{ marginBottom: '10px' }}>Forgot Password</h1>
+                <span style={{ fontSize: '11px', color: '#666', textAlign: 'center', marginBottom: '10px', display: 'block' }}>
+                  Enter email to receive a 6-digit password reset code.
+                </span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  required
+                />
+                <button type="submit">Send Code</button>
+                <a href="#" onClick={(e) => { e.preventDefault(); setIsForgotPassword(false); setMessage(''); }} style={{ marginTop: '15px', textDecoration: 'underline' }}>Back to Sign In</a>
+                {message && (
+                  <p style={{ marginTop: '10px', fontSize: '12px', color: message.startsWith('✅') ? 'green' : 'red' }}>
+                    {message}
+                  </p>
+                )}
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyReset}>
+                <h1 style={{ marginBottom: '10px' }}>Reset Password</h1>
+                <span style={{ fontSize: '11px', color: '#666', textAlign: 'center', marginBottom: '10px', display: 'block' }}>
+                  Check server console for code. Enter the code and a new password.
+                </span>
+                <input
+                  type="text"
+                  name="code"
+                  placeholder="6-digit Code"
+                  required
+                />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="New Password"
+                  required
+                />
+                <button type="submit">Reset Password</button>
+                <a href="#" onClick={(e) => { e.preventDefault(); setIsForgotPassword(false); setResetStep(1); setMessage(''); }} style={{ marginTop: '15px', textDecoration: 'underline' }}>Back to Sign In</a>
+                {message && (
+                  <p style={{ marginTop: '10px', fontSize: '12px', color: message.startsWith('✅') ? 'green' : 'red' }}>
+                    {message}
+                  </p>
+                )}
+              </form>
+            )
+          ) : (
+            <form onSubmit={handleLoginSubmit}>
+              <h1>Sign In</h1>
+              <div className={styles.socialIcons}>
+                <a href="#" className={styles.icon}><FaChrome size={20} /></a>
+                <a href="#" className={styles.icon}><FaFacebook size={20} /></a>
+                <a href="#" className={styles.icon}><FaGithub size={20} /></a>
+                <a href="#" className={styles.icon}><FaLinkedin size={20} /></a>
+              </div>
+              <span>or use your email password</span>
 
-<input
-  type="email"
-  name="email"
-  placeholder="Email"
-/>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+              />
 
-<input
-  type="password"
-  name="password"
-  placeholder="Password"
-/>
-            <a href="#">Forget Your Password?</a>
-         <button type="submit" onClick={() => setIsSignUp(false)}>Sign In</button>
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+              />
+              <a href="#" onClick={(e) => { e.preventDefault(); setIsForgotPassword(true); setResetStep(1); setMessage(''); }}>Forget Your Password?</a>
+              <button type="submit" onClick={() => setIsSignUp(false)}>Sign In</button>
 
-{message && (
-  <p style={{ marginTop: '10px' }}>
-    {message}
-  </p>
-)}
-            
-          </form>
+              {message && (
+                <p style={{ marginTop: '10px', color: message.startsWith('✅') ? 'green' : 'red' }}>
+                  {message}
+                </p>
+              )}
+            </form>
+          )}
         </div>
 
         {/* --- TOGGLE SLIDING OVERLAY --- */}

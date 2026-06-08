@@ -278,8 +278,14 @@ export default function AdminPage() {
 
       {/* Add User Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-hidden animate-in fade-in duration-150">
-          <div className="bg-surface-container-lowest dark:bg-surface-container w-full max-w-md rounded-2xl p-6 shadow-2xl border border-outline-variant/50 space-y-5 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-150">
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 200, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+          className="backdrop-blur-sm animate-in fade-in duration-150"
+        >
+          <div
+            style={{ width: '100%', maxWidth: '448px', maxHeight: '90vh', overflowY: 'auto' }}
+            className="bg-surface-container-lowest dark:bg-surface-container rounded-2xl p-6 shadow-2xl border border-outline-variant/50 space-y-5 animate-in zoom-in-95 duration-150"
+          >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-extrabold">Add New User</h3>
               <button onClick={() => setIsAddModalOpen(false)} className="p-1 rounded-full hover:bg-surface-container-high text-outline cursor-pointer">
@@ -358,8 +364,14 @@ export default function AdminPage() {
 
       {/* Delete Confirmation Modal */}
       {confirmDelete && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-hidden animate-in fade-in duration-150">
-          <div className="bg-surface-container-lowest dark:bg-surface-container w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-outline-variant/50 space-y-5 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-150">
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 200, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+          className="backdrop-blur-sm animate-in fade-in duration-150"
+        >
+          <div
+            style={{ width: '100%', maxWidth: '384px', maxHeight: '90vh', overflowY: 'auto' }}
+            className="bg-surface-container-lowest dark:bg-surface-container rounded-2xl p-6 shadow-2xl border border-outline-variant/50 space-y-5 animate-in zoom-in-95 duration-150"
+          >
             <div className="flex flex-col items-center text-center gap-3">
               <div className="w-12 h-12 bg-error-container rounded-full flex items-center justify-center">
                 <Trash2 size={22} className="text-error" />

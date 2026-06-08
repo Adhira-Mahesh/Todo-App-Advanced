@@ -12,6 +12,7 @@ export async function createTodo(formData: FormData) {
   await prisma.todo.create({
     data: {
       title: input,
+      userId: "",
     },
   });
 

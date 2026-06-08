@@ -14,17 +14,28 @@ enum Role {
 }
 
 model Todo {
-  id          String   @id @default(uuid()) @map("_id")
-  title       String?
+  id          String   @id @default(uuid())
+  title       String
+  tag         String   @default("General")
+  dueTime     String   @default("Today, 5:00 PM")
   isCompleted Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
   createdAt   DateTime @default(now())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String?
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-}
+  id               String   @id @default(uuid())
+  name             String?
+  email            String   @unique
+  password         String
+  role             Role     @default(USER)
+  shareToken       String?  @unique
+  isShareEnabled   Boolean  @default(false)
+  shareEditEnabled Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  todos            Todo[]
+}
+
